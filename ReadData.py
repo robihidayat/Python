@@ -17,15 +17,18 @@ news_exr = r'<!-- E:read image orientation if potrait load this -->(.*?)<!-- POL
 #buat menghapus bagian yang gak diperlukan
 erase_tag = r'<(.*?)>'
 
+
 #buka database yang udah dibuat
 detik_db = create_engine('sqlite:///detiks.db')
-url_link = pd.read_sql_query('SELECT * FROM url_detil',detik_db)
+url_link = pd.read_sql_query('SELECT * FROM url_detik',detik_db)
+
+
 
 
 #buka urlnya
-#htmlfile=urllib.urlopen('http://news.detik.com/berita/3146023/pesawat-cesna-cn235-220-tni-al-ikut-dipamerkan-di-singapore-airshow')
-url=sys.argv[1]
-htmlfile=urllib.urlopen(url)
+htmlfile=urllib.urlopen('http://news.detik.com/berita/3146023/pesawat-cesna-cn235-220-tni-al-ikut-dipamerkan-di-singapore-airshow')
+#url=sys.argv[1]
+#htmlfile=urllib.urlopen(url)
 htmltext=htmlfile.read(htmlfile)
 
 #buat Paternnya
