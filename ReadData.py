@@ -1,3 +1,7 @@
+from pandas import DataFrame
+from sqlalchemy import create_engine
+
+import pandas as pd #this is how I usually import pandas
 import urllib
 import re
 import sys
@@ -10,10 +14,12 @@ itle_exr = r'<title>(.*?)</title>'
 time_exr = '<meta name="pubdate" content="(.*?)" itemprop="datePublished" />'
 author_exr = r'<div class="author">(.*?) - detikNews</div>'
 news_exr = r'<!-- E:read image orientation if potrait load this -->(.*?)<!-- POLONG -->'
-
-
 #buat menghapus bagian yang gak diperlukan
 erase_tag = r'<(.*?)>'
+
+#buka database yang udah dibuat
+detik_db = create_engine('sqlite:///detiks.db')
+url_link = pd.read_sql_query('SELECT * FROM url_detil',detik_db)
 
 
 #buka urlnya
@@ -21,7 +27,6 @@ erase_tag = r'<(.*?)>'
 url=sys.argv[1]
 htmlfile=urllib.urlopen(url)
 htmltext=htmlfile.read(htmlfile)
-
 
 #buat Paternnya
 pattern2=re.compile(itle_exr)
