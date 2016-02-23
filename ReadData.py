@@ -19,17 +19,15 @@ erase_tag = r'<(.*?)>'
 
 
 #buka database yang udah dibuat
-detik_db = create_engine('sqlite:///detiks.db')
+detik_db = create_engine("mysql://root:root@localhost/data_detik")
 url_link = pd.read_sql_query('SELECT * FROM url_detik',detik_db)
-
-
-
+for url in url_link["detik url"]:
 
 #buka urlnya
-htmlfile=urllib.urlopen('http://news.detik.com/berita/3146023/pesawat-cesna-cn235-220-tni-al-ikut-dipamerkan-di-singapore-airshow')
+#htmlfile=urllib.urlopen('http://news.detik.com/berita/3146023/pesawat-cesna-cn235-220-tni-al-ikut-dipamerkan-di-singapore-airshow')
 #url=sys.argv[1]
-#htmlfile=urllib.urlopen(url)
-htmltext=htmlfile.read(htmlfile)
+	htmlfile=urllib.urlopen(url)
+	htmltext=htmlfile.read(htmlfile)
 
 #buat Paternnya
 pattern2=re.compile(itle_exr)

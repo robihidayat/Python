@@ -1,53 +1,50 @@
 #!/usr/bin/python
 
-import MySQLdb
+'''
+'''
 
-# Open database connection
-db = MySQLdb.connect("localhost","root","root","url_data" )
+from sqlalchemy import create_engine
+from pandas import DataFrame
+import urllib2
+import sys
+import re
 
-# prepare a cursor object using cursor() method
-cursor = db.cursor()
+# from bs4 import BeautifulSoup
 
-# Drop table if it already exist using execute() method.
-cursor.execute("DROP TABLE IF EXISTS EMPLOYEE")
+def get_link(url):
+	link_exr = re.compile(r'<a.*?\s*href=\"(.*?)\".*?>(.*?)</a>')
+	links = []
+	
+	# open web content
+	f = urllib2.urlopen(url)
+	content = f.read()
+	
+	# versi find html tag : find all url and save to links
+	# soup = BeautifulSoup(content, "lxml")
+	# for a in soup.find_all('a', href=True):
+	# 	if "detik.com" in a['href']:
+	# 		if "http:" not in a['href']:
+	# 			a['href'] = "http:" + a['href']
+	# 		print "Found the URL:", a['href']
+	# 		links.append(a['href'])
+			
+	# versi regex : find all url and save to links			
+	for link in link_exr.findall(content):
+		if "detik.com" in link[0]:
+			link_detik = link[0]
+			if "http:" not in link_detik:
+				link_detik = "http:" + link_detik
+			links.append(link_detik)
+	
+	# save to DataFrame
+	df = DataFrame(links, columns=['detik url'])
+	df.drop_duplicates()
 
-# Create table as per requirement
-sql = """CREATE TABLE URL (
-         DATA_URL	CHAR(20) NOT NULL,
-         LAST_NAME  CHAR(20),
-         AGE INT,  
-         SEX CHAR(1),
-         INCOME FLOAT )"""
-
-cursor.execute(sql)
-
-# disconnect from server
-db.close()
-
-
-#!/usr/bin/python
-
-import MySQLdb
-
-# Open database connection
-db = MySQLdb.connect("localhost","testuser","test123","TESTDB" )
-
-# prepare a cursor object using cursor() method
-cursor = db.cursor()
-
-# Prepare SQL query to INSERT a record into the database.
-sql = "INSERT INTO EMPLOYEE(FIRST_NAME, \
-       LAST_NAME, AGE, SEX, INCOME) \
-       VALUES ('%s', '%s', '%d', '%c', '%d' )" % \
-       ('Mac', 'Mohan', 20, 'M', 2000)
-try:
-   # Execute the SQL command
-   cursor.execute(sql)
-   # Commit your changes in the database
-   db.commit()
-except:
-   # Rollback in case there is any error
-   db.rollback()
-
-# disconnect from server
-db.close()
+	print df.head(0)
+		# create and save to sqlite database
+	detik_db = create_engine("mysql://root:root@localhost/data_detik") 
+	df.to_sql('url_detik', detik_db, if_exists='replace')
+		
+if __name__ == "__main__":
+	url = sys.argv[1]
+	get_link(url)
